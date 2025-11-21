@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lawn Care Quote Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .calculator-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        .service-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            display: none;
+        }
+
+        .service-info.active {
+            display: block;
+        }
+
+        .price-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .price-display .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .price-display .amount {
+            font-size: 42px;
+            font-weight: bold;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .message.active {
+            display: block;
+        }
+
+        .addon-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .addon-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .checkbox-group:hover {
+            background: #f8f9fa;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .checkbox-price {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .calculator-container {
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .price-display .amount {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="header">
+            <h1>Get an instant quote</h1>
+            <p>We'll follow up to schedule your service!</p>
+        </div>
+
+        <div class="form-container">
+            <form id="quoteForm">
+                <div class="form-group">
+                    <label for="customerName">Your Name *</label>
+                    <input type="text" id="customerName" placeholder="John Smith" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerEmail">Your Email *</label>
+                    <input type="email" id="customerEmail" placeholder="john@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="service">Select Service</label>
+                    <select id="service" required>
+                        <option value="">Choose a service...</option>
+                        <option value="mowing-small" data-price="35" data-info="Up to 5,000 sq ft. Includes mowing, edging, and grass clipping cleanup.">Basic Mowing - Small Lawn</option>
+                        <option value="mowing-medium" data-price="55" data-info="5,000 - 10,000 sq ft. Includes mowing, edging, and grass clipping cleanup.">Basic Mowing - Medium Lawn</option>
+                        <option value="mowing-large" data-price="85" data-info="10,000+ sq ft. Includes mowing, edging, and grass clipping cleanup.">Basic Mowing - Large Lawn</option>
+                        <option value="full-service-small" data-price="65" data-info="Small lawn package with mowing, edging, trimming, blowing, and debris removal.">Full Service - Small Lawn</option>
+                        <option value="full-service-medium" data-price="95" data-info="Medium lawn package with mowing, edging, trimming, blowing, and debris removal.">Full Service - Medium Lawn</option>
+                        <option value="full-service-large" data-price="145" data-info="Large lawn package with mowing, edging, trimming, blowing, and debris removal.">Full Service - Large Lawn</option>
+                        <option value="fertilization" data-price="75" data-info="Professional fertilization treatment for healthy, green grass. Covers up to 10,000 sq ft.">Fertilization Treatment</option>
+                        <option value="weed-control" data-price="65" data-info="Targeted weed control application. Safe for pets and children after drying.">Weed Control Application</option>
+                        <option value="aeration" data-price="120" data-info="Core aeration to improve soil health and water absorption. Up to 10,000 sq ft.">Lawn Aeration</option>
+                        <option value="seeding" data-price="180" data-info="Overseeding service to fill in bare patches and thicken lawn. Includes premium grass seed.">Overseeding Service</option>
+                        <option value="mulching" data-price="95" data-info="Fresh mulch installation for garden beds. Covers up to 200 sq ft (2 cubic yards).">Mulch Installation</option>
+                        <option value="leaf-removal" data-price="110" data-info="Complete leaf removal and yard cleanup. Ideal for fall season.">Leaf Removal & Cleanup</option>
+                    </select>
+                    <div id="serviceInfo" class="service-info"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">Service Frequency</label>
+                    <select id="frequency" required>
+                        <option value="1">One-Time Service</option>
+                        <option value="0.9">Weekly (10% discount)</option>
+                        <option value="0.85">Bi-Weekly (15% discount)</option>
+                        <option value="0.8">Monthly (20% discount)</option>
+                    </select>
+                </div>
+
+                <div class="addon-section">
+                    <h3>Add-On Services</h3>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon1" value="25">
+                        <label for="addon1">Hedge Trimming <span class="checkbox-price">+$25</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon2" value="30">
+                        <label for="addon2">Flower Bed Weeding <span class="checkbox-price">+$30</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon3" value="40">
+                        <label for="addon3">Shrub Pruning <span class="checkbox-price">+$40</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon4" value="20">
+                        <label for="addon4">Gutter Cleaning <span class="checkbox-price">+$20</span></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn">Get Your Quote</button>
+
+                <div id="message" class="message"></div>
+
+                <div class="price-display" id="priceDisplay" style="display: none;">
+                    <div class="label">Your Estimated Total</div>
+                    <div class="amount" id="totalPrice">$0</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // BUSINESS CONFIGURATION
+        // Customize this section for each client
+        // ========================================
+        const businessConfig = {
+            businessName: "Big Fat Cock Trimming",
+            ownerName: "Billy the Bob",
+            ownerEmail: "elijah@nineteen82.net",
+            n8nWebhookUrl: "https://elijahchristo.app.n8n.cloud/webhook-test/send-quote"  // Replace with actual n8n webhook URL
+        };
+        // ========================================
+
+        const serviceSelect = document.getElementById('service');
+        const frequencySelect = document.getElementById('frequency');
+        const serviceInfo = document.getElementById('serviceInfo');
+        const form = document.getElementById('quoteForm');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const totalPriceElement = document.getElementById('totalPrice');
+
+        // Show service information when service is selected
+        serviceSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const info = selectedOption.getAttribute('data-info');
+            
+            if (info) {
+                serviceInfo.textContent = info;
+                serviceInfo.classList.add('active');
+            } else {
+                serviceInfo.classList.remove('active');
+            }
+        });
+
+        // Calculate quote
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+            const basePrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            const frequencyMultiplier = parseFloat(frequencySelect.value);
+            const frequencyText = frequencySelect.options[frequencySelect.selectedIndex].text;
+            
+            // Calculate add-ons
+            let addonTotal = 0;
+            let addonsList = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                addonTotal += parseFloat(checkbox.value);
+                addonsList.push(checkbox.nextElementSibling.textContent.split('+')[0].trim());
+            });
+            
+            // Calculate total
+            const subtotal = basePrice + addonTotal;
+            const total = subtotal * frequencyMultiplier;
+            
+            // Get customer info
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            
+            // Prepare data for n8n
+            const quoteData = {
+                // Business info
+                businessName: businessConfig.businessName,
+                ownerName: businessConfig.ownerName,
+                ownerEmail: businessConfig.ownerEmail,
+                
+                // Customer info
+                customerName: customerName,
+                customerEmail: customerEmail,
+                
+                // Quote details
+                service: selectedOption.text,
+                frequency: frequencyText,
+                addons: addonsList.length > 0 ? addonsList.join(', ') : 'None',
+                basePrice: '$' + basePrice.toFixed(2),
+                addonPrice: '$' + addonTotal.toFixed(2),
+                totalPrice: '$' + total.toFixed(2),
+                
+                // Timestamp
+                timestamp: new Date().toISOString()
+            };
+            
+            // Display result
+            totalPriceElement.textContent = '$' + total.toFixed(2);
+            priceDisplay.style.display = 'block';
+            
+            // Hide any previous messages
+            const messageDiv = document.getElementById('message');
+            messageDiv.classList.remove('active', 'success', 'error');
+            
+            // Send to n8n webhook
+            if (businessConfig.n8nWebhookUrl && businessConfig.n8nWebhookUrl !== "YOUR_N8N_WEBHOOK_URL_HERE") {
+                try {
+                    const response = await fetch(businessConfig.n8nWebhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(quoteData)
+                    });
+                    
+                    if (response.ok) {
+                        messageDiv.textContent = '✓ Quote sent! Check your email for details.';
+                        messageDiv.classList.add('success', 'active');
+                        form.reset();
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    messageDiv.textContent = '⚠ Quote calculated but email failed to send. Please contact us directly.';
+                    messageDiv.classList.add('error', 'active');
+                }
+            } else {
+                // Webhook not configured - show warning
+                messageDiv.textContent = '⚠ Webhook not configured. Quote calculated but emails will not be sent.';
+                messageDiv.classList.add('error', 'active');
+            }
+            
+            // Smooth scroll to price
+            priceDisplay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    </script>
+</body>
+</html>
