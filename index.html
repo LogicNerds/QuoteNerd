@@ -1,1030 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Yeet the Baby — Flight School Starts Early</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lawn Care Quote Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <style>
-    /* =========================
-       RESET & THEME
-       ========================= */
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; padding: 0; }
-    body {
-      font-family: 'Fredoka', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #1a1a1a;
-      color: #111;
-      -webkit-tap-highlight-color: transparent;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    :root{
-      --vh: 1vh;
-      --phone-width: 375px;
-      --phone-height: 667px;
-      --ui-gap: 8px;
-      --radius: 16px;
-      --shadow: 0 8px 24px rgba(0,0,0,0.25);
+        .calculator-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
 
-      --title-size: 36px;
-      --tagline-size: 16px;
-      --label-size: 14px;
-      --btn-size: 18px;
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --safe-top: env(safe-area-inset-top, 0px);
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
 
-      --brand-1: #667eea;
-      --brand-2: #764ba2;
-      --accent-1: #FF6B9D;
-      --accent-2: #C06C84;
-      --mint-1: #4ECDC4;
-      --mint-2: #44A08D;
-    }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-    #app {
-      width: var(--phone-width);
-      height: var(--phone-height);
-      max-height: 100vh;
-      display: grid;
-      grid-template-rows: 1fr 180px;
-      background: #E8D5F2;
-      box-shadow: 0 0 50px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-    }
+        .form-container {
+            padding: 30px;
+        }
 
-    @media (max-width: 414px) {
-      #app {
-        width: 100vw;
-        height: 100vh;
-        max-height: 100vh;
-      }
-    }
+        .form-group {
+            margin-bottom: 25px;
+        }
 
-    #gameArea {
-      position: relative;
-      background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
-      overflow: hidden;
-      border-bottom: 4px solid #2b2b2b;
-      padding-top: 50px;
-    }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-    canvas#gameCanvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      touch-action: manipulation;
-    }
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
 
-    #ui {
-      position: absolute;
-      top: 40px;
-      left: 12px;
-      z-index: 10;
-      color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
-      display: grid;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 14px;
-    }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+        }
 
-    .hud-badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 12px;
-      border: 3px solid #fff;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.25);
-    }
-    #score { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); }
-    #distance { background: linear-gradient(135deg, var(--mint-1), var(--mint-2)); }
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
 
-    .top-actions {
-      position: absolute;
-      top: 40px;
-      right: 12px;
-      display: flex;
-      gap: 8px;
-      z-index: 12;
-    }
+        .service-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+            display: none;
+        }
 
-    .chip {
-      background: rgba(255,255,255,0.9);
-      border: 2px solid var(--accent-1);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
-      transition: transform 0.08s ease;
-    }
-    .chip:active { transform: translateY(1px); }
+        .service-info.active {
+            display: block;
+        }
 
-    #caption {
-      position: absolute;
-      inset: 50% auto auto 50%;
-      transform: translate(-50%, -50%) scale(0.5);
-      background: #fff;
-      color: var(--accent-1);
-      border: 6px solid var(--accent-1);
-      border-radius: 20px;
-      padding: 12px 18px;
-      font-size: 20px;
-      font-weight: 800;
-      text-align: center;
-      box-shadow: 0 8px 0 rgba(0,0,0,0.25);
-      z-index: 20;
-      pointer-events: none;
-      opacity: 0;
-      max-width: 90%;
-      white-space: nowrap;
-    }
-    #caption.show {
-      animation: captionPop 1.8s cubic-bezier(0.68,-0.55,0.265,1.55);
-    }
-    @keyframes captionPop {
-      0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      12%  { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-      22%  { transform: translate(-50%, -50%) scale(1); }
-      80%  { opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
-    }
+        .price-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
 
-    #startScreen {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-      display: grid;
-      place-items: center;
-      z-index: 30;
-      padding: 24px;
-    }
-    .start-wrap {
-      display: grid;
-      gap: 18px;
-      place-items: center;
-      text-align: center;
-      color: #fff;
-    }
-    .game-title {
-      font-size: var(--title-size);
-      font-weight: 800;
-      text-shadow: 6px 6px 0 rgba(0,0,0,0.25);
-      letter-spacing: 0.5px;
-    }
-    .game-tagline {
-      font-size: var(--tagline-size);
-      color: #FFD700;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.25);
-      font-style: italic;
-    }
-    .btn {
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-      color: #fff;
-      border: 4px solid #fff;
-      border-radius: 16px;
-      font-weight: 800;
-      font-size: var(--btn-size);
-      padding: 12px 24px;
-      cursor: pointer;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.3);
-      transition: transform 0.08s ease, box-shadow 0.08s ease;
-      user-select: none;
-    }
-    .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
-    .credits {
-      margin-top: 40px;
-      font-size: 14px;
-      opacity: 0.9;
-    }
+        .price-display .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
 
-    #controlArea {
-      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 8px;
-      padding: 12px;
-      box-shadow: 0 -8px 24px rgba(0,0,0,0.25);
-    }
+        .price-display .amount {
+            font-size: 42px;
+            font-weight: bold;
+        }
 
-    #yeetScale {
-      background: rgba(255,255,255,0.95);
-      border: 4px solid var(--accent-1);
-      border-radius: var(--radius);
-      padding: 10px;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.25);
-      display: grid;
-      gap: 6px;
-    }
-    .scale-title {
-      text-align: center;
-      color: var(--accent-1);
-      font-weight: 800;
-      font-size: 16px;
-    }
-    .bar-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--accent-1);
-    }
-    .scale-bar, .angle-bar {
-      width: 100%;
-      height: 26px;
-      border-radius: 999px;
-      position: relative;
-      overflow: hidden;
-      border: 3px solid var(--accent-1);
-      background: linear-gradient(90deg, #FFB6C1 0%, #FF69B4 50%, #FF1493 100%);
-    }
-    .angle-bar {
-      border-color: var(--mint-1);
-      background: linear-gradient(90deg, var(--mint-1) 0%, #fff 50%, var(--accent-1) 100%);
-    }
-    .indicator {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 8px;
-      height: 100%;
-      background: #fff;
-      box-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px var(--accent-1);
-    }
-    .angle-bar .indicator { box-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px var(--mint-1); }
-    .scale-note {
-      text-align: center;
-      font-size: 12px;
-      color: #555;
-    }
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
+        }
 
-    #yeetBtn {
-      min-height: 50px;
-      min-width: 80px;
-      font-size: 18px;
-      padding: 12px 16px;
-    }
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+        }
 
-    /* CPS Overlay with flashing red animation */
-    #cpsOverlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,0,0,0.95);
-      display: none;
-      z-index: 25;
-      padding: 24px;
-      color: #fff;
-      animation: sirenFlash 0.5s infinite;
-    }
-    
-    @keyframes sirenFlash {
-      0%, 100% { background: rgba(255,0,0,0.95); }
-      50% { background: rgba(200,0,0,0.95); }
-    }
-    
-    #cpsOverlay.active { display: grid; place-items: center; }
-    .cps-wrap { display: grid; gap: 14px; place-items: center; text-align: center; }
-    .cps-title {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      text-shadow: 3px 3px 0 rgba(0,0,0,0.35);
-      animation: shake 0.3s infinite;
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-    
-    .cps-subtitle {
-      font-size: 16px;
-      opacity: 0.95;
-    }
-    .cps-stats {
-      background: rgba(255,255,255,0.18);
-      padding: 12px 16px;
-      border-radius: 12px;
-      display: grid;
-      gap: 6px;
-      font-size: 16px;
-      font-weight: 700;
-      min-width: 60%;
-    }
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
 
-    .cloud {
-      position: absolute;
-      background: #fff;
-      border-radius: 100px;
-      opacity: 0.75;
-      animation: float 20s infinite ease-in-out;
-      filter: drop-shadow(0 6px 6px rgba(0,0,0,0.12));
-      z-index: 1;
-    }
-    @keyframes float {
-      0%,100% { transform: translate(0,0); }
-      50% { transform: translate(22px, -10px); }
-    }
-  </style>
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .message.active {
+            display: block;
+        }
+
+        .addon-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .addon-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .checkbox-group:hover {
+            background: #f8f9fa;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .checkbox-price {
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .calculator-container {
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .price-display .amount {
+                font-size: 36px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="app">
-    <div id="gameArea">
-      <div class="cloud" style="top: 8%; left: 8%; width: 92px; height: 46px;"></div>
-      <div class="cloud" style="top: 20%; left: 72%; width: 112px; height: 56px; animation-delay: -5s;"></div>
-      <div class="cloud" style="top: 15%; left: 45%; width: 84px; height: 42px; animation-delay: -10s;"></div>
-
-      <canvas id="gameCanvas"></canvas>
-
-      <div id="ui">
-        <div id="score" class="hud-badge">YEET SCORE: <span id="scoreValue">0</span></div>
-        <div id="distance" class="hud-badge">DISTANCE: <span id="distanceValue">0</span> ft</div>
-      </div>
-
-      <div class="top-actions">
-        <button id="restartBtn" class="chip" title="Restart">Restart</button>
-      </div>
-
-      <div id="caption"></div>
-
-      <div id="cpsOverlay">
-        <div class="cps-wrap">
-          <div class="cps-title">🚨 CPS IS HERE! 🚨</div>
-          <div class="cps-subtitle">Bro said "Landing Optional 💀"!</div>
-          <div class="cps-stats">
-            <div>Final Score: <span id="cpsScore">0</span></div>
-            <div>Total Distance: <span id="cpsDistance">0</span> ft</div>
-          </div>
-          <button class="btn" id="cpsTryAgain">TRY AGAIN (LEGALLY)</button>
+    <div class="calculator-container">
+        <div class="header">
+            <h1>Get an instant quote</h1>
+            <p>We'll follow up to schedule your service!</p>
         </div>
-      </div>
 
-      <div id="startScreen">
-        <div class="start-wrap">
-          <div class="game-title">🚼 YEET THE BABY 🚼</div>
-          <div class="game-tagline">"Flight School Starts Early"</div>
-          <button id="startBtn" class="btn">START YEETING</button>
-          <div class="credits">Neon Bread Studios © 2025</div>
+        <div class="form-container">
+            <form id="quoteForm">
+                <div class="form-group">
+                    <label for="customerName">Your Name *</label>
+                    <input type="text" id="customerName" placeholder="John Smith" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerEmail">Your Email *</label>
+                    <input type="email" id="customerEmail" placeholder="john@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="service">Select Service</label>
+                    <select id="service" required>
+                        <option value="">Choose a service...</option>
+                        <option value="mowing-small" data-price="35" data-info="Up to 5,000 sq ft. Includes mowing, edging, and grass clipping cleanup.">Basic Mowing - Small Lawn</option>
+                        <option value="mowing-medium" data-price="55" data-info="5,000 - 10,000 sq ft. Includes mowing, edging, and grass clipping cleanup.">Basic Mowing - Medium Lawn</option>
+                        <option value="mowing-large" data-price="85" data-info="10,000+ sq ft. Includes mowing, edging, and grass clipping cleanup.">Basic Mowing - Large Lawn</option>
+                        <option value="full-service-small" data-price="65" data-info="Small lawn package with mowing, edging, trimming, blowing, and debris removal.">Full Service - Small Lawn</option>
+                        <option value="full-service-medium" data-price="95" data-info="Medium lawn package with mowing, edging, trimming, blowing, and debris removal.">Full Service - Medium Lawn</option>
+                        <option value="full-service-large" data-price="145" data-info="Large lawn package with mowing, edging, trimming, blowing, and debris removal.">Full Service - Large Lawn</option>
+                        <option value="fertilization" data-price="75" data-info="Professional fertilization treatment for healthy, green grass. Covers up to 10,000 sq ft.">Fertilization Treatment</option>
+                        <option value="weed-control" data-price="65" data-info="Targeted weed control application. Safe for pets and children after drying.">Weed Control Application</option>
+                        <option value="aeration" data-price="120" data-info="Core aeration to improve soil health and water absorption. Up to 10,000 sq ft.">Lawn Aeration</option>
+                        <option value="seeding" data-price="180" data-info="Overseeding service to fill in bare patches and thicken lawn. Includes premium grass seed.">Overseeding Service</option>
+                        <option value="mulching" data-price="95" data-info="Fresh mulch installation for garden beds. Covers up to 200 sq ft (2 cubic yards).">Mulch Installation</option>
+                        <option value="leaf-removal" data-price="110" data-info="Complete leaf removal and yard cleanup. Ideal for fall season.">Leaf Removal & Cleanup</option>
+                    </select>
+                    <div id="serviceInfo" class="service-info"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">Service Frequency</label>
+                    <select id="frequency" required>
+                        <option value="1">One-Time Service</option>
+                        <option value="0.9">Weekly (10% discount)</option>
+                        <option value="0.85">Bi-Weekly (15% discount)</option>
+                        <option value="0.8">Monthly (20% discount)</option>
+                    </select>
+                </div>
+
+                <div class="addon-section">
+                    <h3>Add-On Services</h3>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon1" value="25">
+                        <label for="addon1">Hedge Trimming <span class="checkbox-price">+$25</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon2" value="30">
+                        <label for="addon2">Flower Bed Weeding <span class="checkbox-price">+$30</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon3" value="40">
+                        <label for="addon3">Shrub Pruning <span class="checkbox-price">+$40</span></label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addon4" value="20">
+                        <label for="addon4">Gutter Cleaning <span class="checkbox-price">+$20</span></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn">Get Your Quote</button>
+
+                <div id="message" class="message"></div>
+
+                <div class="price-display" id="priceDisplay" style="display: none;">
+                    <div class="label">Your Estimated Total</div>
+                    <div class="amount" id="totalPrice">$0</div>
+                </div>
+            </form>
         </div>
-      </div>
     </div>
 
-    <div id="controlArea">
-      <div id="yeetScale">
-        <div class="scale-title" id="scaleTitle">⚡ YEET POWER ⚡</div>
+    <script>
+        // ========================================
+        // BUSINESS CONFIGURATION
+        // Customize this section for each client
+        // ========================================
+        const businessConfig = {
+            businessName: "Big Fat Cock Trimming",
+            ownerName: "Billy the Bob",
+            ownerEmail: "elijah@nineteen82.net",
+            n8nWebhookUrl: "https://elijahchristo.app.n8n.cloud/webhook-test/send-quote"  // Replace with actual n8n webhook URL
+        };
+        // ========================================
 
-        <div id="powerBar">
-          <div class="bar-labels"><span>Weak</span><span>Medium</span><span>Strong</span></div>
-          <div class="scale-bar"><div id="powerIndicator" class="indicator"></div></div>
-        </div>
+        const serviceSelect = document.getElementById('service');
+        const frequencySelect = document.getElementById('frequency');
+        const serviceInfo = document.getElementById('serviceInfo');
+        const form = document.getElementById('quoteForm');
+        const priceDisplay = document.getElementById('priceDisplay');
+        const totalPriceElement = document.getElementById('totalPrice');
 
-        <div id="angleBar" style="display:none;">
-          <div class="bar-labels" style="color:var(--mint-1)"><span>⬇️ Down</span><span>➡️ Straight</span><span>⬆️ Up</span></div>
-          <div class="angle-bar"><div id="angleIndicator" class="indicator"></div></div>
-        </div>
-
-        <div id="powerLabel" class="scale-note">⬆️ Time your clicks carefully! ⬆️</div>
-      </div>
-
-      <button id="yeetBtn" class="btn">YEET!</button>
-    </div>
-  </div>
-
-  <audio id="bgMusic" preload="auto" loop>
-    <source src="retro-8bit-happy-videogame-music-246631.mp3" type="audio/mpeg" />
-  </audio>
-
-  <script>
-    /* GAME STATE & ELEMENTS */
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d', { alpha: true });
-
-    const startScreen = document.getElementById('startScreen');
-    const startBtn = document.getElementById('startBtn');
-    const yeetBtn = document.getElementById('yeetBtn');
-    const powerIndicator = document.getElementById('powerIndicator');
-    const angleIndicator = document.getElementById('angleIndicator');
-    const powerBar = document.getElementById('powerBar');
-    const angleBar = document.getElementById('angleBar');
-    const scaleTitle = document.getElementById('scaleTitle');
-    const powerLabel = document.getElementById('powerLabel');
-    const captionEl = document.getElementById('caption');
-
-    const bgMusic = document.getElementById('bgMusic');
-    const restartBtn = document.getElementById('restartBtn');
-    const cpsOverlay = document.getElementById('cpsOverlay');
-    const cpsTryAgain = document.getElementById('cpsTryAgain');
-
-    const scoreValue = document.getElementById('scoreValue');
-    const distanceValue = document.getElementById('distanceValue');
-    const cpsScore = document.getElementById('cpsScore');
-    const cpsDistance = document.getElementById('cpsDistance');
-
-    // Load sprite images
-    const sprites = {
-      baby: new Image(),
-      pool: new Image(),
-      crib: new Image(),
-      bear: new Image(),
-      parent: new Image()
-    };
-
-    sprites.baby.src = 'https://raw.githubusercontent.com/LogicNerds/YeetTheBaby/main/assets/baby.png';
-    sprites.pool.src = 'https://raw.githubusercontent.com/LogicNerds/YeetTheBaby/main/assets/pool.png';
-    sprites.crib.src = 'https://raw.githubusercontent.com/LogicNerds/YeetTheBaby/main/assets/crib.png';
-    sprites.bear.src = 'https://raw.githubusercontent.com/LogicNerds/YeetTheBaby/main/assets/bear.png';
-    sprites.parent.src = 'https://raw.githubusercontent.com/LogicNerds/YeetTheBaby/main/assets/parent.png';
-
-    // Wait for all images to load
-    let imagesLoaded = 0;
-    const totalImages = 5;
-    Object.values(sprites).forEach(img => {
-      img.onload = () => {
-        imagesLoaded++;
-        if (imagesLoaded === totalImages) {
-          console.log('All sprites loaded!');
-        }
-      };
-      img.onerror = () => {
-        console.error('Failed to load sprite:', img.src);
-      };
-    });
-
-    let gameState = 'start';
-    let score = 0;
-    let totalDistance = 0;
-    let yeetPhase = 'power';
-    let powerValue = 0;
-    let angleValue = 50;
-
-    // FIXED POSITIONS - 25ft spacing (94px at 3.75px/ft)
-    // Parent at 5ft (19px), all objects level at y=400
-    const parent = { x: 19, y: 400, width: 40, height: 40 };
-    let baby = {
-      x: 0, y: 0, vx: 0, vy: 0,
-      rotation: 0, rotationSpeed: 0, size: 12, flying: false
-    };
-
-    // Pool at 40ft (150px = 113+37.5)
-    // Crib at 65ft (244px = 207+37.5)  
-    // Bear at 90ft (338px = 301+37.5)
-    // All zones are SQUARE to match 1:1 sprite aspect ratios
-    let landingZones = [
-      { x: 131, y: 400, width: 50, height: 50, type: 'pool', name: 'POOL', multiplier: 2, color: '#4ECDC4', hasWalls: true, wallThickness: 6 },
-      { x: 225, y: 400, width: 50, height: 50, type: 'crib', name: 'CRIB', multiplier: 5, color: '#FFB6C1', hasWalls: true, wallThickness: 5 },
-      { x: 310, y: 400, width: 60, height: 60, type: 'bear', name: 'BEAR', multiplier: -1, color: '#8B4513', hasWalls: false }
-    ];
-
-    /* CANVAS SETUP */
-    let canvasHeight = 517;
-    let canvasWidth = 375;
-    let scale = 1;
-    
-    function resizeCanvas() {
-      const area = document.getElementById('gameArea');
-      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1));
-
-      const cssW = area.clientWidth;
-      const cssH = area.clientHeight;
-      
-      canvasHeight = cssH;
-      canvasWidth = cssW;
-      
-      // Calculate scale factor (assuming 375px base width)
-      scale = canvasWidth / 375;
-
-      canvas.width = Math.floor(cssW * dpr);
-      canvas.height = Math.floor(cssH * dpr);
-
-      canvas.style.width = cssW + 'px';
-      canvas.style.height = cssH + 'px';
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      
-      // Update positions based on actual height and scale
-      const groundY = canvasHeight - 100;
-      parent.x = -20;
-      parent.y = groundY - 60;
-      
-      // POOL - scale all dimensions including height and wallThickness
-      landingZones[0].x = 91 * scale;
-      landingZones[0].width = 75 * scale;
-      landingZones[0].height = 75 * scale;
-      landingZones[0].y = groundY - 30;
-      landingZones[0].wallThickness = 6 * scale;
-      
-      // CRIB - scale all dimensions including height and wallThickness
-      landingZones[1].x = 201 * scale;
-      landingZones[1].width = 55 * scale;
-      landingZones[1].height = 55 * scale;
-      landingZones[1].y = groundY - 30;
-      landingZones[1].wallThickness = 5 * scale;
-      
-      // BEAR - scale all dimensions (no walls)
-      landingZones[2].x = 290 * scale;
-      landingZones[2].width = 110 * scale;
-      landingZones[2].height = 110 * scale;
-      landingZones[2].y = groundY - 65;
-
-      if (!baby.flying) {
-        baby.x = parent.x + 45;
-        baby.y = parent.y + 30;
-      }
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    /* AUDIO - Simple direct play on start */
-
-    /* START / RESTART */
-    startBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      startScreen.style.display = 'none';
-      gameState = 'ready';
-      
-      // Direct music play - triggered by user click with error handling
-      console.log('Start button clicked - attempting to play music...');
-      console.log('Audio src:', bgMusic.src);
-      console.log('Audio readyState:', bgMusic.readyState);
-      console.log('Audio networkState:', bgMusic.networkState);
-      
-      bgMusic.volume = 1.0;
-      bgMusic.currentTime = 0;
-      
-      const playPromise = bgMusic.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log('✅ Music playing successfully!');
-          })
-          .catch(error => {
-            console.error('❌ Music play failed:', error);
-            console.error('Error name:', error.name);
-            console.error('Error message:', error.message);
-          });
-      }
-      
-      startPowerAnim();
-      requestAnimationFrame(gameLoop);
-    });
-
-    // Add event listeners for audio loading
-    bgMusic.addEventListener('loadeddata', () => {
-      console.log('✅ Audio file loaded successfully');
-    });
-    
-    bgMusic.addEventListener('error', (e) => {
-      console.error('❌ Audio loading error:', e);
-      console.error('Audio error code:', bgMusic.error ? bgMusic.error.code : 'unknown');
-      console.error('Audio error message:', bgMusic.error ? bgMusic.error.message : 'unknown');
-    });
-    
-    bgMusic.addEventListener('canplay', () => {
-      console.log('✅ Audio can start playing');
-    });
-
-    restartBtn.addEventListener('click', (e)=>{ e.preventDefault(); resetGame(); });
-    cpsTryAgain.addEventListener('click', (e)=>{ e.preventDefault(); resetGame(); });
-
-    /* POWER & ANGLE INDICATORS */
-    let rafId = null;
-    let indicatorDir = 1;
-    let powerPos = 0;
-    let anglePos = 0;
-
-    function startPowerAnim(){
-      cancelAnimationFrame(rafId);
-      indicatorDir = 1;
-      powerPos = 0;
-      powerBar.style.display = 'block';
-      angleBar.style.display = 'none';
-      scaleTitle.textContent = '⚡ YEET POWER ⚡';
-      powerLabel.textContent = '⬆️ Time your clicks carefully! ⬆️';
-      animatePower();
-    }
-
-    function animatePower(){
-      powerPos += indicatorDir * 4;
-      if (powerPos >= 100) { powerPos = 100; indicatorDir = -1; }
-      if (powerPos <= 0)   { powerPos = 0;   indicatorDir = 1; }
-      powerIndicator.style.left = powerPos + '%';
-      rafId = requestAnimationFrame(animatePower);
-    }
-
-    function startAngleAnim(){
-      cancelAnimationFrame(rafId);
-      indicatorDir = 1;
-      anglePos = 0;
-      powerBar.style.display = 'none';
-      angleBar.style.display = 'block';
-      scaleTitle.textContent = '📐 YEET ANGLE 📐';
-      powerLabel.textContent = 'CLICK YEET FOR ANGLE!';
-      animateAngle();
-    }
-
-    function animateAngle(){
-      anglePos += indicatorDir * 3.5;
-      if (anglePos >= 100) { anglePos = 100; indicatorDir = -1; }
-      if (anglePos <= 0)   { anglePos = 0;   indicatorDir = 1; }
-      angleIndicator.style.left = anglePos + '%';
-      rafId = requestAnimationFrame(animateAngle);
-    }
-
-    function handleYeetPress(){
-      if (gameState === 'ready') {
-        powerValue = powerPos;
-        startAngleAnim();
-        gameState = 'aiming';
-        return;
-      }
-      if (gameState === 'aiming') {
-        angleValue = anglePos;
-        cancelAnimationFrame(rafId);
-        launchBaby();
-      }
-    }
-
-    yeetBtn.addEventListener('click', (e)=>{ e.preventDefault(); handleYeetPress(); });
-
-    /* PHYSICS & GAME LOGIC */
-    let randomEvent = null;
-    let eventDuration = 0;
-
-    const launchCaptions = [
-      "CERTIFIED YEET TECHNICIAN! 🎯",
-      "PARENTING LEVEL: EXPERT 👶",
-      "SEND IT! 🚀",
-      "WEEEEE! 🎢",
-      "NASA CALLED 📞",
-      "TO THE MOON! 🌙",
-      "BIG YEET ENERGY ⚡"
-    ];
-
-    const landingCaptions = [
-      "BUTTER SMOOTH! 🧈",
-      "10/10 LANDING ✨",
-      "STYLE POINTS! 💯",
-      "SAFE AND SOUND 🛡️",
-      "DIAPER INTACT ✅",
-      "PERFECT FORM 🎨",
-      "NAILED IT! 🎯"
-    ];
-
-    const failCaptions = [
-      "YIKES... 😬",
-      "CHILD SUPPORT AVOIDED... 🙈",
-      "FOLDED THAT KID! 📚",
-      "NOT GIVING 'LOVING PARENT' 🤷",
-      "OOPSIE DAISY 🌼"
-    ];
-
-    function launchBaby(){
-      const velocity = (powerValue / 100) * 8 + 5;
-
-      const angleDeg = -45 + (angleValue * 0.9);
-      const angleRad = angleDeg * Math.PI / 180;
-
-      baby.vx = Math.cos(angleRad) * velocity;
-      baby.vy = -Math.sin(angleRad) * velocity;
-      baby.flying = true;
-      baby.rotationSpeed = (Math.random() - 0.5) * 0.3;
-
-      gameState = 'flying';
-
-      if (Math.random() < 0.3) triggerRandomEvent();
-    }
-
-    function triggerRandomEvent(){
-      const events = [
-        { type:'wind', name:'GUSTY WIND', force:(Math.random()-0.5)*0.5, emoji: '🌪️' },
-        { type:'helicopter', name:'HELICOPTER MOM', force:0, emoji: '🚁' },
-        { type:'explosion', name:'DIAPER DETONATION', force:0, emoji: '💥' },
-      ];
-      randomEvent = events[Math.floor(Math.random()*events.length)];
-      eventDuration = 120;
-    }
-
-    function updatePhysics(){
-      if (!baby.flying) return;
-
-      // Store previous position for continuous collision detection
-      const prevX = baby.x;
-      const prevY = baby.y;
-
-      // Apply gravity
-      baby.vy += 0.5;
-
-      // Apply wind event
-      if (randomEvent && randomEvent.type === 'wind') baby.vx += randomEvent.force;
-
-      // Calculate new position
-      baby.x += baby.vx;
-      baby.y += baby.vy;
-      baby.rotation += baby.rotationSpeed;
-
-      // Ground collision - check first since it ends the physics
-      const groundY = canvasHeight - 100;
-      if (baby.y >= groundY) {
-        baby.y = groundY;
-        checkLanding();
-        return;
-      }
-
-      // Wall collision detection for pool and crib
-      for (let zone of landingZones) {
-        if (!zone.hasWalls) continue;
-
-        const babyRadius = baby.size / 2;
-        
-        // Define the solid walls (left, right, bottom - NO TOP)
-        const leftWall = zone.x + zone.wallThickness;
-        const rightWall = zone.x + zone.width - zone.wallThickness;
-        const bottomWall = zone.y + zone.height;
-        const topWall = zone.y; // This is OPEN - baby can enter from above
-
-        // Check if baby is within the vertical range of the zone (including space above for entry)
-        const inVerticalRange = baby.y >= topWall && baby.y - babyRadius <= bottomWall;
-
-        if (inVerticalRange) {
-          
-          // LEFT WALL COLLISION
-          // From outside (moving right) OR from inside (moving left after bouncing off right wall)
-          if (baby.vx > 0 && prevX + babyRadius <= leftWall && baby.x + babyRadius > leftWall) {
-            // Coming from left side (outside) - bounce back left
-            baby.x = leftWall - babyRadius;
-            baby.vx *= -0.7;
-            baby.rotationSpeed *= -1;
-          } else if (baby.vx < 0 && prevX - babyRadius >= leftWall && baby.x - babyRadius < leftWall) {
-            // Coming from right side (inside) - bounce back right
-            baby.x = leftWall + babyRadius;
-            baby.vx *= -0.7;
-            baby.rotationSpeed *= -1;
-          }
-          
-          // RIGHT WALL COLLISION
-          // From outside (moving left) OR from inside (moving right)
-          if (baby.vx > 0 && prevX - babyRadius < rightWall && baby.x - babyRadius >= rightWall) {
-            // Coming from left side (inside) - bounce back left
-            baby.x = rightWall + babyRadius;
-            baby.vx *= -0.7;
-            baby.rotationSpeed *= -1;
-          } else if (baby.vx < 0 && prevX + babyRadius >= rightWall && baby.x + babyRadius < rightWall) {
-            // Coming from right side (outside) - bounce back right
-            baby.x = rightWall - babyRadius;
-            baby.vx *= -0.7;
-            baby.rotationSpeed *= -1;
-          }
-
-          // BOTTOM WALL COLLISION - inside container, hitting bottom
-          // Only check if baby is horizontally inside the container
-          if (baby.x > leftWall && baby.x < rightWall) {
-            if (prevY + babyRadius <= bottomWall && baby.y + babyRadius > bottomWall && baby.vy > 0) {
-              // Hit bottom of pool/crib - THIS COUNTS AS A SUCCESSFUL LANDING!
-              baby.y = bottomWall;
-              baby.flying = false;
-              checkLanding();
-              return; // Stop physics and award points
+        // Show service information when service is selected
+        serviceSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const info = selectedOption.getAttribute('data-info');
+            
+            if (info) {
+                serviceInfo.textContent = info;
+                serviceInfo.classList.add('active');
+            } else {
+                serviceInfo.classList.remove('active');
             }
-          }
-        }
-      }
+        });
 
-      // Screen boundaries
-      if (baby.x < 0 || baby.x > canvasWidth || baby.y > canvasHeight) {
-        triggerCPS();
-      }
-    }
-
-    function checkLanding(){
-      baby.flying = false; baby.vx = 0; baby.vy = 0;
-
-      let landedZone = null;
-      for (let zone of landingZones) {
-        // Only check horizontal position - baby is already at ground level
-        if (baby.x >= zone.x && baby.x <= zone.x + zone.width) {
-          landedZone = zone; 
-          break;
-        }
-      }
-
-      if (!landedZone) {
-        showCaption(failCaptions[Math.floor(Math.random() * failCaptions.length)]);
-        setTimeout(triggerCPS, 1500);
-        return;
-      }
-
-      if (landedZone.type === 'bear') {
-        showCaption('🐻 BEAR DELETED BABY! 🐻');
-        setTimeout(triggerCPS, 2000);
-        return;
-      }
-
-      // Pool or Crib = SUCCESS!
-      showCaption(landingCaptions[Math.floor(Math.random() * landingCaptions.length)]);
-      const distance = Math.max(0, Math.floor((baby.x - parent.x - 25 * scale) / scale));
-      const base = distance * landedZone.multiplier;
-      let bonus = Math.floor(Math.abs(baby.rotation) * 10);
-      if (randomEvent) bonus += 500;
-
-      const finalScore = base + bonus;
-      score += finalScore;
-      totalDistance += distance;
-      updateScoreUi();
-
-      setTimeout(resetForNextThrow, 2000);
-    }
-
-    function triggerCPS(){
-      gameState = 'cps';
-      cpsScore.textContent = score;
-      cpsDistance.textContent = totalDistance;
-      cpsOverlay.classList.add('active');
-    }
-
-    function showCaption(text){
-      captionEl.textContent = text;
-      captionEl.classList.remove('show'); void captionEl.offsetWidth;
-      captionEl.classList.add('show');
-    }
-
-    function updateScoreUi(){
-      scoreValue.textContent = score;
-      distanceValue.textContent = totalDistance;
-    }
-
-    function resetForNextThrow(){
-      baby.vx = 0; baby.vy = 0;
-      baby.rotation = 0; baby.flying = false;
-      randomEvent = null;
-      gameState = 'ready';
-      yeetPhase = 'power';
-      startPowerAnim();
-resizeCanvas();
-    }
-
-    function resetGame(){
-      cpsOverlay.classList.remove('active');
-      startScreen.style.display = 'none';
-      score = 0; totalDistance = 0;
-      updateScoreUi();
-      resetForNextThrow();
-    }
-
-    /* RENDERING */
-    function drawGround(){
-      const groundY = canvasHeight - 100;
-      ctx.fillStyle = '#90EE90';
-      ctx.fillRect(0, groundY, canvasWidth, 100);
-
-      ctx.strokeStyle = '#228B22';
-      ctx.lineWidth = 2;
-      for (let i = 0; i < canvasWidth; i += 20) {
-        ctx.beginPath();
-        ctx.moveTo(i, groundY);
-        ctx.lineTo(i + 5, groundY - 10);
-        ctx.stroke();
-      }
-    }
-
-    function drawParent(){
-      ctx.save();
-      ctx.translate(parent.x, parent.y);
-      
-      // Draw parent sprite - adjust size as needed
-      const spriteSize = parent.width * 2;
-      ctx.drawImage(sprites.parent, 0, 0, spriteSize, spriteSize);
-      
-      ctx.restore();
-    }
-
-    function drawBaby(){
-      ctx.save();
-      ctx.translate(baby.x, baby.y);
-      ctx.rotate(baby.rotation);
-      
-      // Draw sprite centered - adjust multiplier for desired size
-      const spriteWidth = baby.size * 2.5;
-const spriteHeight = baby.size * 3.5;
-ctx.drawImage(sprites.baby, -spriteWidth/2, -spriteHeight/2, spriteWidth, spriteHeight);
-      
-      ctx.restore();
-    }
-
-    function drawZones(){
-      landingZones.forEach(zone=>{
-        ctx.save();
-        ctx.translate(zone.x, zone.y);
-
-        if (zone.type === 'pool') {
-          // Draw pool sprite
-          ctx.drawImage(sprites.pool, 0, 0, zone.width, zone.height);
-          
-          // Add label
-          ctx.font = 'bold 16px Fredoka';
-          ctx.fillStyle = '#FFF';
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 3;
-          ctx.textAlign = 'center';
-          ctx.strokeText('POOL', zone.width/2, -10);
-          ctx.fillText('POOL', zone.width/2, -10);
-          ctx.strokeText('x' + zone.multiplier, zone.width/2, zone.height + 20);
-          ctx.fillText('x' + zone.multiplier, zone.width/2, zone.height + 20);
-
-        } else if (zone.type === 'crib') {
-          // Draw crib sprite
-          ctx.drawImage(sprites.crib, 0, 0, zone.width, zone.height);
-          
-          // Add label
-          ctx.font = 'bold 16px Fredoka';
-          ctx.fillStyle = '#FFF';
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 3;
-          ctx.textAlign = 'center';
-          ctx.strokeText('CRIB', zone.width/2, -10);
-          ctx.fillText('CRIB', zone.width/2, -10);
-          ctx.strokeText('x' + zone.multiplier, zone.width/2, zone.height + 20);
-          ctx.fillText('x' + zone.multiplier, zone.width/2, zone.height + 20);
-
-        } else if (zone.type === 'bear') {
-          // Draw bear sprite
-          ctx.drawImage(sprites.bear, 0, 0, zone.width, zone.height);
-          
-          // Add label
-          ctx.font = 'bold 12px Fredoka';
-          ctx.fillStyle = '#FF0000';
-          ctx.strokeStyle = '#000';
-          ctx.lineWidth = 2;
-          ctx.textAlign = 'center';
-          ctx.strokeText('🚨 BEAR 🚨', zone.width/2, -10);
-          ctx.fillText('🚨 BEAR 🚨', zone.width/2, -10);
-        }
-
-        ctx.restore();
-      });
-    }
-
-    function drawRandomEvent(){
-      if (!randomEvent || eventDuration <= 0) return;
-      eventDuration--;
-      ctx.font = 'bold 24px Fredoka';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#fff';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 4;
-      const text = randomEvent.emoji + ' ' + randomEvent.name + ' ' + randomEvent.emoji;
-      ctx.strokeText(text, canvasWidth/2, 100);
-      ctx.fillText(text, canvasWidth/2, 100);
-
-      if (randomEvent.type === 'wind') {
-        for (let i=0;i<10;i++){
-          ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          const y = 150 + i*50;
-          const off = (Date.now()/10 + i*20) % canvasWidth;
-          ctx.moveTo(off, y); ctx.lineTo(off + 30, y);
-          ctx.stroke();
-        }
-      }
-      if (randomEvent.type === 'helicopter') {
-        const x = canvasWidth/2 + Math.sin(Date.now()/500)*100;
-        const y = 150;
-        ctx.fillStyle = '#FF0000';
-        ctx.fillRect(x-30, y, 60, 20);
-        ctx.fillRect(x-5, y-15, 10, 15);
-        ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
-        ctx.beginPath(); ctx.moveTo(x-40, y-15); ctx.lineTo(x+40, y-15); ctx.stroke();
-      }
-    }
-
-    function gameLoop(){
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-      drawGround();
-      drawZones();
-      drawParent();
-      drawBaby();
-      drawRandomEvent();
-
-      if (gameState === 'flying') updatePhysics();
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    window.addEventListener('load', resizeCanvas);
-  </script>
+        // Calculate quote
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+            const basePrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            const frequencyMultiplier = parseFloat(frequencySelect.value);
+            const frequencyText = frequencySelect.options[frequencySelect.selectedIndex].text;
+            
+            // Calculate add-ons
+            let addonTotal = 0;
+            let addonsList = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                addonTotal += parseFloat(checkbox.value);
+                addonsList.push(checkbox.nextElementSibling.textContent.split('+')[0].trim());
+            });
+            
+            // Calculate total
+            const subtotal = basePrice + addonTotal;
+            const total = subtotal * frequencyMultiplier;
+            
+            // Get customer info
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            
+            // Prepare data for n8n
+            const quoteData = {
+                // Business info
+                businessName: businessConfig.businessName,
+                ownerName: businessConfig.ownerName,
+                ownerEmail: businessConfig.ownerEmail,
+                
+                // Customer info
+                customerName: customerName,
+                customerEmail: customerEmail,
+                
+                // Quote details
+                service: selectedOption.text,
+                frequency: frequencyText,
+                addons: addonsList.length > 0 ? addonsList.join(', ') : 'None',
+                basePrice: '$' + basePrice.toFixed(2),
+                addonPrice: '$' + addonTotal.toFixed(2),
+                totalPrice: '$' + total.toFixed(2),
+                
+                // Timestamp
+                timestamp: new Date().toISOString()
+            };
+            
+            // Display result
+            totalPriceElement.textContent = '$' + total.toFixed(2);
+            priceDisplay.style.display = 'block';
+            
+            // Hide any previous messages
+            const messageDiv = document.getElementById('message');
+            messageDiv.classList.remove('active', 'success', 'error');
+            
+            // Send to n8n webhook
+            if (businessConfig.n8nWebhookUrl && businessConfig.n8nWebhookUrl !== "YOUR_N8N_WEBHOOK_URL_HERE") {
+                try {
+                    const response = await fetch(businessConfig.n8nWebhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(quoteData)
+                    });
+                    
+                    if (response.ok) {
+                        messageDiv.textContent = '✓ Quote sent! Check your email for details.';
+                        messageDiv.classList.add('success', 'active');
+                        form.reset();
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                } catch (error) {
+                    console.error('Error sending quote:', error);
+                    messageDiv.textContent = '⚠ Quote calculated but email failed to send. Please contact us directly.';
+                    messageDiv.classList.add('error', 'active');
+                }
+            } else {
+                // Webhook not configured - show warning
+                messageDiv.textContent = '⚠ Webhook not configured. Quote calculated but emails will not be sent.';
+                messageDiv.classList.add('error', 'active');
+            }
+            
+            // Smooth scroll to price
+            priceDisplay.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    </script>
 </body>
 </html>
